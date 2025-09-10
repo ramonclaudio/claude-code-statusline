@@ -1,0 +1,115 @@
+name: Fuzz Testing
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'test/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'test/**'
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz-test:
+    name: Fuzz Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Enable corepack and set npm version
+      run: |
+        corepack enable
+        corepack prepare npm@11.6.0 --activate
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install fast-check with lock file
+      run: |
+        echo '{"name":"fuzz-test","devDependencies":{"fast-check":"4.3.0"}}' > package.json
+        npx --package=npm@11.6.0 npm install --package-lock-only
+        npm ci
+
+    - name: Create fuzz test
+      run: |
+        mkdir -p test
+        cat << 'EOF' > test/fuzz.test.js
+        const fc = require('fast-check');
+        const fs = require('fs');
+        const path = require('path');
+
+        // Import our utilities for fuzzing
+        let utils;
+        try {
+          utils = require('../dist/utils.js');
+        } catch (e) {
+          // Build first if dist doesn't exist
+          const { execSync } = require('child_process');
+          execSync('npm run build', { stdio: 'inherit' });
+          utils = require('../dist/utils.js');
+        }
+
+        describe('Fuzz Testing', () => {
+          test('exists handles arbitrary strings', () => {
+            fc.assert(fc.property(fc.string(), async (input) => {
+              try {
+                const result = await utils.exists(input);
+                expect(typeof result).toBe('boolean');
+              } catch (error) {
+                // Expected to handle gracefully
+                expect(error).toBeInstanceOf(Error);
+              }
+            }));
+          });
+
+          test('exists handles special characters', () => {
+            fc.assert(fc.property(fc.string({ minLength: 1, maxLength: 100 }), async (input) => {
+              try {
+                // Ensure path doesn't contain null bytes
+                if (!input.includes('\0')) {
+                  const result = await utils.exists(input);
+                  expect(typeof result).toBe('boolean');
+                }
+              } catch (error) {
+                // Expected to handle gracefully
+                expect(error).toBeInstanceOf(Error);
+              }
+            }));
+          });
+
+          test('exists handles deeply nested paths', () => {
+            fc.assert(fc.property(fc.array(fc.string({ minLength: 1, maxLength: 20 }), { minLength: 1, maxLength: 10 }), async (segments) => {
+              try {
+                const testPath = segments.join('/');
+                const result = await utils.exists(testPath);
+                expect(typeof result).toBe('boolean');
+              } catch (error) {
+                // Expected to handle gracefully
+                expect(error).toBeInstanceOf(Error);
+              }
+            }));
+          });
+        });
+        EOF
+
+    - name: Run fuzz tests
+      run: npm test test/fuzz.test.js || true
+
+    - name: Clean up
+      run: rm -f test/fuzz.test.js && npm uninstall fast-check

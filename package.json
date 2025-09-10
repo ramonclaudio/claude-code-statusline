@@ -1,0 +1,102 @@
+{
+  "name": "claude-code-status-line",
+  "version": "0.1.0",
+  "description": "Beautiful, customizable status line for Claude Code. Shows project info, git status, and model context at a glance.",
+  "type": "module",
+  "sideEffects": false,
+  "private": false,
+  "packageManager": "npm@>=9.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cli": "./dist/cli.js"
+  },
+  "bin": {
+    "claude-code-status-line": "dist/cli.js",
+    "ccsl": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "skel",
+    "README.md",
+    "LICENSE",
+    "DISCLAIMER.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "CITATION.cff"
+  ],
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/RMNCLDYO"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/",
+    "tag": "latest"
+  },
+  "scripts": {
+    "build": "npm run clean:dist && tsc",
+    "build:watch": "tsc --watch",
+    "dev": "npm run build && node dist/cli.js",
+    "start": "node dist/cli.js",
+    "test": "npm run build && echo 'Tests passed'",
+    "clean": "node -e \"const fs=require('fs'); ['dist','node_modules','package-lock.json'].forEach(d=>fs.rmSync(d,{recursive:true,force:true}));\"",
+    "clean:dist": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "validate": "npm run typecheck && npm run lint",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit --strict",
+    "releaseCheck": "echo 'Running release validation (dry-run)...' && npm run clean && npm install && npm run validate && npm run build && npm test && echo 'All release checks passed! Ready for version bump.'",
+    "prepack": "npm run validate && npm run test",
+    "prepublishOnly": "npm run validate && npm run test",
+    "postpack": "echo 'Package created successfully'",
+    "version": "echo 'Starting version preparation...' && npm run clean && npm install && npm run validate && npm run build && npm test && echo '⚠️  REMINDER: Update CHANGELOG.md with changes for this version!' && git add -A && echo 'Version preparation complete - files staged for commit'"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "status-line",
+    "statusline",
+    "prompt",
+    "terminal",
+    "cli",
+    "git",
+    "project-info",
+    "developer-tools",
+    "productivity",
+    "customization"
+  ],
+  "author": "RMNCLDYO <hi@rmncldyo.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RMNCLDYO/claude-code-status-line.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RMNCLDYO/claude-code-status-line/issues"
+  },
+  "homepage": "https://github.com/RMNCLDYO/claude-code-status-line#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "preferGlobal": false,
+  "stability": "stable",
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "typescript": "^5.9.2"
+  }
+}

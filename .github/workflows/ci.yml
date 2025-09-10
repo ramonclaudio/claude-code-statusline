@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || !startsWith(github.event.head_commit.message, 'Merge pull request')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Enable corepack and set npm version
+      run: |
+        corepack enable
+        corepack prepare npm@11.6.0 --activate
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run type check
+      run: npm run typecheck
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@16df4fbc19aea13d921737861d6c622bf3cefe23 # v2.23.0
+      with:
+        languages: javascript-typescript
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@16df4fbc19aea13d921737861d6c622bf3cefe23 # v2.23.0
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@16df4fbc19aea13d921737861d6c622bf3cefe23 # v2.23.0
+
+  fuzz:
+    name: Fuzz Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Enable corepack and set npm version
+      run: |
+        corepack enable
+        corepack prepare npm@11.6.0 --activate
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    - name: Run basic robustness tests
+      run: |
+        mkdir -p test
+        cat << 'EOF' > robustness.test.mjs
+        import { test } from 'node:test';
+        import { strict as assert } from 'node:assert';
+        import * as utils from './dist/utils.js';
+
+        test('exists handles edge cases', async () => {
+          const testCases = ['', '   ', 'invalid', '../malicious', '/nonexistent'];
+          for (const input of testCases) {
+            try {
+              const result = await utils.exists(input);
+              assert.equal(typeof result, 'boolean');
+            } catch (error) {
+              assert.ok(error instanceof Error);
+            }
+          }
+          
+          const invalidTestCases = [null, undefined];
+          for (const input of invalidTestCases) {
+            try {
+              await utils.exists(input);
+              assert.fail('Should have thrown for invalid input');
+            } catch (error) {
+              assert.ok(error instanceof Error);
+            }
+          }
+        });
+
+        test('exists returns false for non-existent paths', async () => {
+          const result = await utils.exists('/this/path/definitely/does/not/exist');
+          assert.equal(result, false);
+        });
+
+        test('exists returns true for current directory', async () => {
+          const result = await utils.exists('.');
+          assert.equal(result, true);
+        });
+        EOF
+        
+        node --test robustness.test.mjs
