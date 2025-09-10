@@ -1,5 +1,5 @@
 {
-  "name": "claude-code-status-line",
+  "name": "create-claude-statusline",
   "version": "0.1.0",
   "description": "Beautiful, customizable status line for Claude Code. Shows project info, git status, and model context at a glance.",
   "type": "module",
@@ -16,8 +16,8 @@
     "./cli": "./dist/cli.js"
   },
   "bin": {
-    "claude-code-status-line": "dist/cli.js",
-    "ccsl": "dist/cli.js"
+    "create-claude-statusline": "dist/cli.js",
+    "ccs": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -74,12 +74,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RMNCLDYO/claude-code-status-line.git"
+    "url": "git+https://github.com/RMNCLDYO/create-claude-statusline.git"
   },
   "bugs": {
-    "url": "https://github.com/RMNCLDYO/claude-code-status-line/issues"
+    "url": "https://github.com/RMNCLDYO/create-claude-statusline/issues"
   },
-  "homepage": "https://github.com/RMNCLDYO/claude-code-status-line#readme",
+  "homepage": "https://github.com/RMNCLDYO/create-claude-statusline#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

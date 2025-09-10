@@ -66,7 +66,7 @@ async function validateSkelFiles(): Promise<void> {
     throw new InitError(
       `PACKAGE CORRUPTED: Skeleton files missing\n` +
       `Expected: ${skelDir}\n` +
-      `Action: Reinstall with 'npm install -g claude-code-status-line'`,
+      `Action: Reinstall with 'npm install -g create-claude-statusline'`,
       ErrorCode.SKELETON_FILES_MISSING
     );
   }
@@ -92,7 +92,7 @@ async function validateSkelFiles(): Promise<void> {
     throw new InitError(
       `PACKAGE CORRUPTED: Required files missing\n` +
       `Missing: ${missingFiles.join(', ')}\n` +
-      `Action: Reinstall with 'npm install -g claude-code-status-line'`,
+      `Action: Reinstall with 'npm install -g create-claude-statusline'`,
       ErrorCode.SKELETON_FILES_MISSING
     );
   }

@@ -61,8 +61,8 @@ jobs:
       - name: Create package tarball and set version
         run: |
           npm pack
-          echo "PACKAGE_FILE=$(ls claude-code-status-line-*.tgz | head -1)" >> $GITHUB_ENV
-          echo "VERSION=$(ls claude-code-status-line-*.tgz | head -1 | sed 's/claude-code-status-line-\(.*\)\.tgz/\1/')" >> $GITHUB_ENV
+          echo "PACKAGE_FILE=$(ls create-claude-statusline-*.tgz | head -1)" >> $GITHUB_ENV
+          echo "VERSION=$(ls create-claude-statusline-*.tgz | head -1 | sed 's/create-claude-statusline-\(.*\)\.tgz/\1/')" >> $GITHUB_ENV
         
       - name: Install and verify minisign
         run: |
@@ -88,7 +88,7 @@ jobs:
         run: |
           if [ ! -f minisign.key.skip ]; then
             # Use -W flag to read password from stdin
-            echo "${{ secrets.MINISIGN_PASSPHRASE }}" | minisign -Sm "$PACKAGE_FILE" -s minisign.key -W -t "claude-code-status-line npm package v$VERSION - $(date -u +%Y-%m-%d)"
+            echo "${{ secrets.MINISIGN_PASSPHRASE }}" | minisign -Sm "$PACKAGE_FILE" -s minisign.key -W -t "create-claude-statusline npm package v$VERSION - $(date -u +%Y-%m-%d)"
             echo "✓ Successfully signed package with minisign"
           else
             echo "::warning::Skipping minisign signature generation"
@@ -114,21 +114,21 @@ jobs:
         with:
           path: .
           format: 'spdx-json'
-          output-file: 'claude-code-status-line-${{ env.VERSION }}.sbom.spdx.json'
+          output-file: 'create-claude-statusline-${{ env.VERSION }}.sbom.spdx.json'
           
       - name: Generate CycloneDX JSON SBOM
         uses: anchore/sbom-action@e11c554f704a0b820cbf8c51673f6945e0731532 # v0.20.0
         with:
           path: .
           format: 'cyclonedx-json'
-          output-file: 'claude-code-status-line-${{ env.VERSION }}.sbom.cyclonedx.json'
+          output-file: 'create-claude-statusline-${{ env.VERSION }}.sbom.cyclonedx.json'
           
       - name: Generate CycloneDX XML SBOM
         uses: anchore/sbom-action@e11c554f704a0b820cbf8c51673f6945e0731532 # v0.20.0
         with:
           path: .
           format: 'cyclonedx-xml'
-          output-file: 'claude-code-status-line-${{ env.VERSION }}.sbom.cyclonedx.xml'
+          output-file: 'create-claude-statusline-${{ env.VERSION }}.sbom.cyclonedx.xml'
           
       - name: Generate legacy SPDX with Microsoft tool
         run: |
@@ -139,8 +139,8 @@ jobs:
           chmod +x sbom-tool-linux-x64
           
           # Generate Microsoft SBOM
-          ./sbom-tool-linux-x64 generate -b . -bc . -pn claude-code-status-line -pv $VERSION -ps RMNCLDYO -nsb https://github.com/RMNCLDYO/claude-code-status-line
-          mv _manifest/spdx_2.2/manifest.spdx.json "claude-code-status-line-$VERSION.ms-spdx.json"
+          ./sbom-tool-linux-x64 generate -b . -bc . -pn create-claude-statusline -pv $VERSION -ps RMNCLDYO -nsb https://github.com/RMNCLDYO/create-claude-statusline
+          mv _manifest/spdx_2.2/manifest.spdx.json "create-claude-statusline-$VERSION.ms-spdx.json"
           
           # Cleanup
           rm -rf _manifest sbom-tool-linux-x64
@@ -148,11 +148,11 @@ jobs:
       - name: Sign all SBOMs and attestations
         run: |
           # Sign all SBOM files with both minisign and GPG (if keys available)
-          for sbom in claude-code-status-line-$VERSION.sbom.* claude-code-status-line-$VERSION.ms-spdx.json; do
+          for sbom in create-claude-statusline-$VERSION.sbom.* create-claude-statusline-$VERSION.ms-spdx.json; do
             if [ -f "$sbom" ]; then
               echo "Signing $sbom"
               if [ ! -f minisign.key.skip ]; then
-                echo "${{ secrets.MINISIGN_PASSPHRASE }}" | minisign -Sm "$sbom" -s minisign.key -W -t "SBOM for claude-code-status-line v$VERSION"
+                echo "${{ secrets.MINISIGN_PASSPHRASE }}" | minisign -Sm "$sbom" -s minisign.key -W -t "SBOM for create-claude-statusline v$VERSION"
               fi
               gpg --armor --detach-sign --output "$sbom.asc" "$sbom"
             fi
@@ -179,18 +179,10 @@ jobs:
           
       - name: Publish to GitHub Packages
         run: |
-          # Update package name for GitHub Packages (scoped)
-          npm pkg set name="@rmncldyo/claude-code-status-line"
-          
-          # Publish to GitHub Packages with provenance
+          # Package already has scoped name, publish directly
           npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Restore original package name
-        run: |
-          # Restore original package name for npm registry
-          npm pkg set name="claude-code-status-line"
           
       - name: Create comprehensive GitHub Release
         uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.3.2
@@ -202,12 +194,12 @@ jobs:
             
             **Install from npm:**
             ```bash
-            npm install -g claude-code-status-line@${{ github.ref_name }}
+            npm install -g create-claude-statusline@${{ github.ref_name }}
             ```
             
             **Install from GitHub Packages:**
             ```bash
-            npm install -g @rmncldyo/claude-code-status-line@${{ github.ref_name }} --registry=https://npm.pkg.github.com
+            npm install -g @rmncldyo/create-claude-statusline@${{ github.ref_name }} --registry=https://npm.pkg.github.com
             ```
             
             ## 🔐 Security & Verification
@@ -218,10 +210,10 @@ jobs:
             curl -O https://raw.githubusercontent.com/${{ github.repository }}/main/minisign.pub
             
             # Verify minisign signature (recommended)
-            minisign -Vm claude-code-status-line-${{ github.ref_name }}.tgz -p minisign.pub
+            minisign -Vm create-claude-statusline-${{ github.ref_name }}.tgz -p minisign.pub
             
             # Verify GPG signature
-            gpg --verify claude-code-status-line-${{ github.ref_name }}.tgz.asc claude-code-status-line-${{ github.ref_name }}.tgz
+            gpg --verify create-claude-statusline-${{ github.ref_name }}.tgz.asc create-claude-statusline-${{ github.ref_name }}.tgz
             ```
             
             **Supply Chain Attestations:**
@@ -235,10 +227,10 @@ jobs:
             
             | Format | File | Signatures |
             |--------|------|------------|
-            | **SPDX 2.3** | `claude-code-status-line-${{ github.ref_name }}.sbom.spdx.json` | `.minisig`, `.asc` |
-            | **CycloneDX** | `claude-code-status-line-${{ github.ref_name }}.sbom.cyclonedx.json` | `.minisig`, `.asc` |
-            | **CycloneDX XML** | `claude-code-status-line-${{ github.ref_name }}.sbom.cyclonedx.xml` | `.minisig`, `.asc` |
-            | **Microsoft SPDX** | `claude-code-status-line-${{ github.ref_name }}.ms-spdx.json` | `.minisig`, `.asc` |
+            | **SPDX 2.3** | `create-claude-statusline-${{ github.ref_name }}.sbom.spdx.json` | `.minisig`, `.asc` |
+            | **CycloneDX** | `create-claude-statusline-${{ github.ref_name }}.sbom.cyclonedx.json` | `.minisig`, `.asc` |
+            | **CycloneDX XML** | `create-claude-statusline-${{ github.ref_name }}.sbom.cyclonedx.xml` | `.minisig`, `.asc` |
+            | **Microsoft SPDX** | `create-claude-statusline-${{ github.ref_name }}.ms-spdx.json` | `.minisig`, `.asc` |
             
             ## 🛡️ Security Standards Compliance
             
@@ -249,10 +241,10 @@ jobs:
             
             ---
             
-            **Full Changelog**: [CHANGELOG.md](https://github.com/RMNCLDYO/claude-code-status-line/blob/main/CHANGELOG.md)
+            **Full Changelog**: [CHANGELOG.md](https://github.com/RMNCLDYO/create-claude-statusline/blob/main/CHANGELOG.md)
           files: |
-            claude-code-status-line-*.tgz
-            claude-code-status-line-*.tgz.minisig
-            claude-code-status-line-*.tgz.asc
-            claude-code-status-line-*.sbom.*
-            claude-code-status-line-*.ms-spdx.json*
+            create-claude-statusline-*.tgz
+            create-claude-statusline-*.tgz.minisig
+            create-claude-statusline-*.tgz.asc
+            create-claude-statusline-*.sbom.*
+            create-claude-statusline-*.ms-spdx.json*

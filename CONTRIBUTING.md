@@ -10,8 +10,8 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/RMNCLDYO/claude-code-status-line.git
-cd claude-code-status-line
+git clone https://github.com/RMNCLDYO/create-claude-statusline.git
+cd create-claude-statusline
 npm install
 npm test
 ```
@@ -54,7 +54,7 @@ npm run lint    # TypeScript strict mode
 
 ## Issues
 
-Found a bug? [Open an issue](https://github.com/RMNCLDYO/claude-code-status-line/issues) with:
+Found a bug? [Open an issue](https://github.com/RMNCLDYO/create-claude-statusline/issues) with:
 - Node version
 - Operating system
 - Error message

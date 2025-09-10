@@ -30,7 +30,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of claude-code-status-line are you running?
+      description: What version of create-claude-statusline are you running?
       options:
         - 0.1.0
       default: 0

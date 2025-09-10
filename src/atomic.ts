@@ -230,7 +230,7 @@ export class TransactionLog {
   private backupDir: string;
   
   constructor() {
-    this.backupDir = join(tmpdir(), `.claude-code-status-line-tx-${Date.now()}-${randomBytes(4).toString('hex')}`);
+    this.backupDir = join(tmpdir(), `.create-claude-statusline-tx-${Date.now()}-${randomBytes(4).toString('hex')}`);
   }
   
   async init(): Promise<void> {

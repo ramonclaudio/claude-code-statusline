@@ -73,10 +73,10 @@ async function runInit(options: { dryRun?: boolean; directory?: string | undefin
 }
 
 function showHelp(): void {
-  console.log(`claude-code-status-line - Beautiful status line for Claude Code`);
+  console.log(`create-claude-statusline - Beautiful status line for Claude Code`);
   console.log(``);
   console.log(`USAGE:`);
-  console.log(`  claude-code-status-line [directory] [OPTIONS]`);
+  console.log(`  create-claude-statusline [directory] [OPTIONS]`);
   console.log(`  ccsl [directory] [OPTIONS]`);
   console.log(``);
   console.log(`DESCRIPTION:`);
@@ -93,9 +93,9 @@ function showHelp(): void {
   console.log(`  --dry-run      Show what would be done without making changes`);
   console.log(``);
   console.log(`EXAMPLES:`);
-  console.log(`  claude-code-status-line              # Setup in current directory`);
-  console.log(`  claude-code-status-line my-project   # Setup in ./my-project directory`);
-  console.log(`  claude-code-status-line --dry-run    # Preview changes without applying`);
+  console.log(`  create-claude-statusline              # Setup in current directory`);
+  console.log(`  create-claude-statusline my-project   # Setup in ./my-project directory`);
+  console.log(`  create-claude-statusline --dry-run    # Preview changes without applying`);
 }
 
 function checkNodeVersion(): void {

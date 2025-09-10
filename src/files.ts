@@ -65,7 +65,7 @@ function getSourceDir(): string {
 
 async function createBackupDir(projectPath: string): Promise<string> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupDir = join(projectPath, `.claude-code-status-line-backup-${timestamp}`);
+  const backupDir = join(projectPath, `.create-claude-statusline-backup-${timestamp}`);
   
   await withRetry(
     async () => await fs.mkdir(backupDir, { recursive: true }),

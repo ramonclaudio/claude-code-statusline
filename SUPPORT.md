@@ -1,13 +1,13 @@
 # Support
 
-Thanks for using claude-code-status-line! This document explains how to get help with the project.
+Thanks for using create-claude-statusline! This document explains how to get help with the project.
 
 ## Getting Help
 
 ### Community Support
 
-- **GitHub Discussions**: Ask questions and discuss ideas with the community at [GitHub Discussions](https://github.com/RMNCLDYO/claude-code-status-line/discussions)
-- **Issues**: Report bugs or request features through [GitHub Issues](https://github.com/RMNCLDYO/claude-code-status-line/issues)
+- **GitHub Discussions**: Ask questions and discuss ideas with the community at [GitHub Discussions](https://github.com/RMNCLDYO/create-claude-statusline/discussions)
+- **Issues**: Report bugs or request features through [GitHub Issues](https://github.com/RMNCLDYO/create-claude-statusline/issues)
 
 ### Documentation
 
@@ -41,7 +41,7 @@ Before creating an issue, please:
    - Operating system
    - Node.js version
    - npm/yarn/pnpm version
-   - claude-code-status-line version
+   - create-claude-statusline version
 
 ## Commercial Support
 

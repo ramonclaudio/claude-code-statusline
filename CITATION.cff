@@ -1,15 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata from this file."
 type: software
-title: "claude-code-status-line"
+title: "create-claude-statusline"
 abstract: "Beautiful, customizable status line for Claude Code. Shows project info, git status, and model context at a glance."
 authors:
   - given-names: "RMNCLDYO"
     email: "hi@rmncldyo.com"
     orcid: "https://orcid.org/0009-0008-2148-3095"
-repository-code: "https://github.com/RMNCLDYO/claude-code-status-line"
-url: "https://github.com/RMNCLDYO/claude-code-status-line"
-repository-artifact: "https://www.npmjs.com/package/claude-code-status-line"
+repository-code: "https://github.com/RMNCLDYO/create-claude-statusline"
+url: "https://github.com/RMNCLDYO/create-claude-statusline"
+repository-artifact: "https://www.npmjs.com/package/create-claude-statusline"
 keywords:
   - "claude"
   - "claude-code" 
@@ -26,6 +26,6 @@ keywords:
   - "typescript"
   - "npm"
 license: MIT
-license-url: "https://github.com/RMNCLDYO/claude-code-status-line/blob/main/LICENSE"
+license-url: "https://github.com/RMNCLDYO/create-claude-statusline/blob/main/LICENSE"
 version: "0.1.0"
 date-released: "2025-09-10"
