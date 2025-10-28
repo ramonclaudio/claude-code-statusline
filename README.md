@@ -1,6 +1,6 @@
 # create-claude-statusline
 
-Beautiful status line for Claude Code. Shows git status, model context, and project info at a glance.
+Beautiful, highly customizable status line for Claude Code with granular control over every element.
 
 [![version](https://img.shields.io/npm/v/create-claude-statusline.svg?label=version&color=brightgreen)](https://www.npmjs.com/package/create-claude-statusline)
 [![downloads](https://img.shields.io/npm/dm/create-claude-statusline.svg?label=downloads&color=blue)](https://www.npmjs.com/package/create-claude-statusline)
@@ -15,17 +15,30 @@ npm create claude-statusline
 
 *Adds a beautiful status line to your Claude Code. ZERO dependencies in your project.*
 
+### ✨ What's New
+
+- **Granular Control**: Toggle every element individually - project, branch, framework, runtime, each git status type, and model
+- **Centralized Config**: New `statusline-config.cjs` file for easy customization
+- **Intuitive Colors**: Color-coded git status (green → orange → yellow → red) for instant visual feedback
+- **Performance**: Only runs git operations when needed based on your config
+
 ## What You Get
 
 ```
-[ ◈ my-project on ⎇ main ↑ 2 / ? 3 via ◉ React (node) | ⚡ Opus ]
+[ ◈ my-project on ⎇ main via ◉ React (node) | ↑ 2 / + 1 / ~ 3 / ? 2 | ⌘ Sonnet 4.5 ]
 ```
 
-This tells you:
-- **Project**: `my-project`
-- **Git branch**: `main` with 2 commits ahead, 3 untracked files
-- **Framework**: React (running on Node.js)
-- **Model**: Opus
+**What each element shows:**
+- `◈ my-project` - Project name (light blue)
+- `⎇ main` - Git branch (light green)
+- `◉ React (node)` - Framework and runtime (pink/tan)
+- `↑ 2` - Commits ahead (green)
+- `+ 1` - Staged files (orange)
+- `~ 3` - Modified files (yellow)
+- `? 2` - Untracked files (red)
+- `⌘ Sonnet 4.5` - Claude model (purple)
+
+**Color coding:** Green (good) → Orange (ready) → Yellow (pending) → Red (needs attention)
 
 ## Installation
 
@@ -53,13 +66,17 @@ ccs                       # Short alias
 
 ## Features
 
-✨ **Smart Detection** - Automatically detects your framework, runtime, and package manager
+🎯 **Granular Control** - Toggle every element individually (project name, branch, framework, runtime, each git status type, model)
 
-🎨 **Customizable** - Modify colors, icons, and sections to match your style
+📊 **Clear Git Status** - Separate indicators for ahead/behind, staged, modified, and untracked with intuitive color coding (green → orange → yellow → red)
 
-⚡ **Fast** - Caches git operations for sub-100ms updates
+✨ **Smart Detection** - Automatically detects your framework (React, Vue, Next.js, etc.) and runtime (Node, Bun, Python, Rust, Go, etc.)
 
-🔒 **Safe** - Creates automatic backups before making any changes
+🎨 **Fully Customizable** - Centralized config file for all features, colors, and icons
+
+⚡ **Fast & Efficient** - Intelligent caching with rate limiting for sub-100ms updates
+
+🔒 **Safe & Secure** - Command allowlisting, path validation, and automatic backups
 
 📦 **Zero Dependencies** - No runtime dependencies in your project
 
@@ -70,20 +87,47 @@ ccs                       # Short alias
 ├── settings.local.json          # Status line configuration
 └── scripts/
     ├── statusline.cjs           # Main status line logic
+    ├── statusline-config.cjs    # Configuration options
     ├── statusline-git.cjs       # Git integration
     └── statusline-detect.cjs    # Framework detection
 ```
 
 ## Customization
 
-Edit `.claude/scripts/statusline.cjs` to customize:
+Edit `.claude/scripts/statusline-config.cjs` to customize:
+
+### Feature Toggles
+```javascript
+FEATURES: {
+  SHOW_PROJECT: true,        // Show project name
+  SHOW_GIT_BRANCH: true,     // Show git branch
+  SHOW_FRAMEWORK: true,      // Show detected framework (React, Vue, etc.)
+  SHOW_RUNTIME: true,        // Show runtime (Node.js, Bun, etc.)
+  SHOW_GIT_AHEAD: true,      // Show commits ahead of remote
+  SHOW_GIT_BEHIND: true,     // Show commits behind remote
+  SHOW_GIT_STAGED: true,     // Show staged files
+  SHOW_GIT_MODIFIED: true,   // Show modified (unstaged) files
+  SHOW_GIT_UNTRACKED: true,  // Show untracked files
+  SHOW_MODEL: true,          // Show Claude model name
+}
+```
 
 ### Colors
+
+Color scheme follows an intuitive severity gradient:
+
 ```javascript
 COLORS: {
-  PROJECT: '\x1b[38;5;117m',  // Light blue
-  BRANCH: '\x1b[38;5;156m',   // Light green
-  MODEL: '\x1b[38;5;93m',     // Purple
+  PROJECT: '\x1b[38;5;117m',       // Light blue
+  BRANCH: '\x1b[38;5;156m',        // Light green
+  FRAMEWORK: '\x1b[38;5;219m',     // Pink
+  RUNTIME: '\x1b[38;5;180m',       // Tan
+  GIT_AHEAD: '\x1b[38;5;46m',      // Green - you're ahead!
+  GIT_BEHIND: '\x1b[38;5;196m',    // Red - action needed
+  GIT_STAGED: '\x1b[38;5;214m',    // Orange - ready to commit
+  GIT_MODIFIED: '\x1b[38;5;226m',  // Yellow - needs staging
+  GIT_UNTRACKED: '\x1b[38;5;196m', // Red - needs attention
+  MODEL: '\x1b[38;5;93m',          // Purple
 }
 ```
 
@@ -92,11 +136,22 @@ COLORS: {
 ICONS: {
   PROJECT: '◈',
   BRANCH: '⎇',
-  MODEL: '⚡',
   GIT_AHEAD: '↑',
   GIT_BEHIND: '↓',
+  GIT_STAGED: '+',
+  GIT_MODIFIED: '~',
+  GIT_UNTRACKED: '?',
+  MODEL: '⌘'
 }
 ```
+
+### Supported Frameworks & Runtimes
+
+**Frameworks:** Next.js, Nuxt.js, NestJS, React, Vue, Angular, Svelte, Express, Fastify
+
+**Runtimes:** Node.js, Bun, TypeScript, Python, Rust, Go, Java, C/C++
+
+All configuration is centralized in `.claude/scripts/statusline-config.cjs` - one file to control everything!
 
 ## Safety
 
@@ -137,6 +192,27 @@ await init('/path/to/project', {
 - [Claude Code](https://claude.ai/code)
 - Git (optional, for git status features)
 
+## Example: Minimal Configuration
+
+Want just git branch and status? Edit `.claude/scripts/statusline-config.cjs`:
+
+```javascript
+FEATURES: {
+  SHOW_PROJECT: false,       // Hide project name
+  SHOW_GIT_BRANCH: true,     // Show branch
+  SHOW_FRAMEWORK: false,     // Hide framework
+  SHOW_RUNTIME: false,       // Hide runtime
+  SHOW_GIT_AHEAD: true,      // Show ahead
+  SHOW_GIT_BEHIND: true,     // Show behind
+  SHOW_GIT_STAGED: true,     // Show staged
+  SHOW_GIT_MODIFIED: true,   // Show modified
+  SHOW_GIT_UNTRACKED: true,  // Show untracked
+  SHOW_MODEL: false,         // Hide model
+}
+```
+
+Result: `[ ⎇ main | ↑ 1 / + 2 / ~ 3 / ? 1 ]`
+
 ## Troubleshooting
 
 **Status line not showing?**
@@ -145,12 +221,16 @@ await init('/path/to/project', {
 ls -la .claude/scripts/statusline.cjs
 
 # Test manually
-echo '{"model":{"display_name":"Test"}}' | node .claude/scripts/statusline.cjs
+echo '{"model":{"display_name":"Test"},"workspace":{"current_dir":"'"$(pwd)"'"}}' | node .claude/scripts/statusline.cjs
 ```
 
 **Git info missing?**
-- Ensure you're in a git repository
-- Check that `git status` works
+- Ensure you're in a git repository (`git status` should work)
+- Check that git features are enabled in `statusline-config.cjs`
+
+**Want different colors?**
+- Edit COLORS in `.claude/scripts/statusline-config.cjs`
+- Use 256-color codes: `\x1b[38;5;NUMBERm` (see [256-color chart](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg))
 
 ## Links
 

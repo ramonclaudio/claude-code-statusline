@@ -71,12 +71,13 @@ function parseGitStatus(status) {
 
 function formatGitStatus(counts, config) {
   const { COLORS, ICONS } = config;
-  
+
   return {
     ahead: counts.ahead > 0 ? `${COLORS.GIT_AHEAD}${ICONS.GIT_AHEAD} ${counts.ahead}${COLORS.RESET}` : '',
     behind: counts.behind > 0 ? `${COLORS.GIT_BEHIND}${ICONS.GIT_BEHIND} ${counts.behind}${COLORS.RESET}` : '',
-    untracked: counts.untracked > 0 ? `${COLORS.GIT_UNTRACKED}${ICONS.GIT_UNTRACKED} ${counts.untracked}${COLORS.RESET}` : '',
-    staged: counts.staged > 0 ? `${COLORS.GIT_STAGED}${ICONS.GIT_STAGED} ${counts.staged}${COLORS.RESET}` : ''
+    staged: counts.staged > 0 ? `${COLORS.GIT_STAGED}${ICONS.GIT_STAGED} ${counts.staged}${COLORS.RESET}` : '',
+    modified: counts.modified > 0 ? `${COLORS.GIT_MODIFIED}${ICONS.GIT_MODIFIED} ${counts.modified}${COLORS.RESET}` : '',
+    untracked: counts.untracked > 0 ? `${COLORS.GIT_UNTRACKED}${ICONS.GIT_UNTRACKED} ${counts.untracked}${COLORS.RESET}` : ''
   };
 }
 

@@ -2,34 +2,7 @@ const { readFileSync } = require('node:fs');
 const { basename } = require('node:path');
 const { getGitInfo } = require('./statusline-git.cjs');
 const { detectFramework, detectRuntime } = require('./statusline-detect.cjs');
-
-const CONFIG = {
-  GIT_CACHE_TTL: 1000,
-  
-  COLORS: {
-    PROJECT: '\x1b[38;5;117m',
-    BRANCH: '\x1b[38;5;156m',
-    FRAMEWORK: '\x1b[38;5;219m',
-    RUNTIME: '\x1b[38;5;180m',
-    GIT_AHEAD: '\x1b[38;5;46m',
-    GIT_BEHIND: '\x1b[38;5;196m',
-    GIT_UNTRACKED: '\x1b[38;5;214m',
-    GIT_STAGED: '\x1b[38;5;82m',
-    MODEL: '\x1b[38;5;93m',
-    DIM: '\x1b[38;5;244m',
-    RESET: '\x1b[0m'
-  },
-  
-  ICONS: {
-    PROJECT: '◈',
-    BRANCH: '⎇',
-    GIT_AHEAD: '↑',
-    GIT_BEHIND: '↓',
-    GIT_UNTRACKED: '?',
-    GIT_STAGED: '+',
-    MODEL: '⚡'
-  },
-};
+const CONFIG = require('./statusline-config.cjs');
 
 function sanitizePath(path) {
   if (!path || path.includes('..') || path.length > 1000) return null;
@@ -41,7 +14,7 @@ function validateStatusInput(input) {
   if (!input || typeof input !== 'object') return {};
   const obj = input;
   const result = {};
-  
+
   if (typeof obj.session_id === 'string' && obj.session_id.length < 100) {
     result.session_id = obj.session_id;
   }
@@ -52,7 +25,7 @@ function validateStatusInput(input) {
   if (typeof obj.version === 'string' && obj.version.length < 50) {
     result.version = obj.version;
   }
-  
+
   if (obj.model && typeof obj.model === 'object' && obj.model !== null) {
     const model = obj.model;
     const modelResult = {};
@@ -64,7 +37,7 @@ function validateStatusInput(input) {
     }
     if (Object.keys(modelResult).length > 0) result.model = modelResult;
   }
-  
+
   if (obj.workspace && typeof obj.workspace === 'object' && obj.workspace !== null) {
     const workspace = obj.workspace;
     const workspaceResult = {};
@@ -78,14 +51,14 @@ function validateStatusInput(input) {
     }
     if (Object.keys(workspaceResult).length > 0) result.workspace = workspaceResult;
   }
-  
+
   if (obj.output_style && typeof obj.output_style === 'object' && obj.output_style !== null) {
     const outputStyle = obj.output_style;
     if (typeof outputStyle.name === 'string' && outputStyle.name.length < 20) {
       result.output_style = { name: outputStyle.name };
     }
   }
-  
+
   return result;
 }
 
@@ -103,37 +76,50 @@ function getCachedGitInfo(cwd) {
 }
 
 function buildProjectSection(project, git, framework, runtime) {
-  const { COLORS, ICONS } = CONFIG;
-  let section = `${COLORS.PROJECT}${ICONS.PROJECT} ${project}${COLORS.RESET}`;
-  
-  if (git) {
-    section += ` on ${COLORS.BRANCH}${ICONS.BRANCH} ${git.branch}${COLORS.RESET}`;
+  const { COLORS, ICONS, FEATURES } = CONFIG;
+  let section = '';
+
+  if (FEATURES.SHOW_PROJECT) {
+    section = `${COLORS.PROJECT}${ICONS.PROJECT} ${project}${COLORS.RESET}`;
   }
-  
-  if (framework) {
-    section += ` via ${COLORS.FRAMEWORK}${framework.icon} ${framework.name}${COLORS.RESET} ${COLORS.DIM}(${COLORS.RUNTIME}${runtime.name}${COLORS.RESET}${COLORS.DIM})${COLORS.RESET}`;
-  } else {
-    section += ` via ${COLORS.RUNTIME}${runtime.icon} ${runtime.name}${COLORS.RESET}`;
+
+  if (FEATURES.SHOW_GIT_BRANCH && git) {
+    if (section) section += ' on ';
+    section += `${COLORS.BRANCH}${ICONS.BRANCH} ${git.branch}${COLORS.RESET}`;
   }
-  
+
+  if (FEATURES.SHOW_FRAMEWORK && framework && FEATURES.SHOW_RUNTIME) {
+    if (section) section += ' via ';
+    section += `${COLORS.FRAMEWORK}${framework.icon} ${framework.name}${COLORS.RESET} ${COLORS.DIM}(${COLORS.RUNTIME}${runtime.name}${COLORS.RESET}${COLORS.DIM})${COLORS.RESET}`;
+  } else if (FEATURES.SHOW_FRAMEWORK && framework) {
+    if (section) section += ' via ';
+    section += `${COLORS.FRAMEWORK}${framework.icon} ${framework.name}${COLORS.RESET}`;
+  } else if (FEATURES.SHOW_RUNTIME && runtime) {
+    if (section) section += ' via ';
+    section += `${COLORS.RUNTIME}${runtime.icon} ${runtime.name}${COLORS.RESET}`;
+  }
+
   return section;
 }
 
 function buildGitCommitSection(git) {
-  if (!git || (!git.ahead && !git.behind)) return null;
-  
+  const { FEATURES } = CONFIG;
+  if (!git) return null;
+
   const parts = [];
-  if (git.ahead) parts.push(git.ahead);
-  if (git.behind) parts.push(git.behind);
+  if (FEATURES.SHOW_GIT_AHEAD && git.ahead) parts.push(git.ahead);
+  if (FEATURES.SHOW_GIT_BEHIND && git.behind) parts.push(git.behind);
   return parts.length > 0 ? parts.join(' / ') : null;
 }
 
 function buildGitFileSection(git) {
-  if (!git || (!git.untracked && !git.staged)) return null;
-  
+  const { FEATURES } = CONFIG;
+  if (!git) return null;
+
   const parts = [];
-  if (git.untracked) parts.push(git.untracked);
-  if (git.staged) parts.push(git.staged);
+  if (FEATURES.SHOW_GIT_STAGED && git.staged) parts.push(git.staged);
+  if (FEATURES.SHOW_GIT_MODIFIED && git.modified) parts.push(git.modified);
+  if (FEATURES.SHOW_GIT_UNTRACKED && git.untracked) parts.push(git.untracked);
   return parts.length > 0 ? parts.join(' / ') : null;
 }
 
@@ -148,26 +134,32 @@ function buildNoWorkspaceStatus(modelName) {
 }
 
 function buildStatus(input) {
+  const { FEATURES } = CONFIG;
   const modelName = input.model?.display_name || 'Claude';
   const currentDir = input.workspace?.current_dir;
-  
+
   if (!currentDir) return buildNoWorkspaceStatus(modelName);
 
   const project = basename(currentDir);
-  const git = getCachedGitInfo(currentDir);
-  const framework = detectFramework(currentDir);
-  const runtime = detectRuntime(currentDir);
-  
+  const needsGitInfo = FEATURES.SHOW_GIT_BRANCH || FEATURES.SHOW_GIT_AHEAD || FEATURES.SHOW_GIT_BEHIND || FEATURES.SHOW_GIT_STAGED || FEATURES.SHOW_GIT_MODIFIED || FEATURES.SHOW_GIT_UNTRACKED;
+  const git = needsGitInfo ? getCachedGitInfo(currentDir) : null;
+  const framework = FEATURES.SHOW_FRAMEWORK ? detectFramework(currentDir) : null;
+  const runtime = FEATURES.SHOW_RUNTIME ? detectRuntime(currentDir) : null;
+
   const sections = [];
-  sections.push(buildProjectSection(project, git, framework, runtime));
-  
+  const projectSection = buildProjectSection(project, git, framework, runtime);
+  if (projectSection) sections.push(projectSection);
+
   const commitSection = buildGitCommitSection(git);
   if (commitSection) sections.push(commitSection);
-  
+
   const fileSection = buildGitFileSection(git);
   if (fileSection) sections.push(fileSection);
-  
-  sections.push(buildModelSection(modelName));
+
+  if (FEATURES.SHOW_MODEL) {
+    sections.push(buildModelSection(modelName));
+  }
+
   return sections.join(' | ');
 }
 

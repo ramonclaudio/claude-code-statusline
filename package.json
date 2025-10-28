@@ -1,11 +1,11 @@
 {
   "name": "create-claude-statusline",
-  "version": "0.1.0",
-  "description": "Beautiful, customizable status line for Claude Code. Shows project info, git status, and model context at a glance.",
+  "version": "0.2.0",
+  "description": "Beautiful, highly customizable status line for Claude Code with granular control over every element. Shows project info, git status, framework, and model.",
   "type": "module",
   "sideEffects": false,
   "private": false,
-  "packageManager": "npm@>=9.0.0",
+  "packageManager": "npm@>=11.6.2",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -96,7 +96,7 @@
   "preferGlobal": false,
   "stability": "stable",
   "devDependencies": {
-    "@types/node": "^24.3.1",
-    "typescript": "^5.9.2"
+    "@types/node": "^24.9.1",
+    "typescript": "^5.9.3"
   }
 }
