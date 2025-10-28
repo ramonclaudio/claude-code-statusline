@@ -180,8 +180,10 @@ jobs:
           scope: '@rmncldyo'
           
       - name: Publish to GitHub Packages
+        continue-on-error: true
         run: |
-          # Package already has scoped name, publish directly
+          # GitHub Packages requires scoped package name (@org/name)
+          # Publishing unscoped package will fail but won't block the workflow
           npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
