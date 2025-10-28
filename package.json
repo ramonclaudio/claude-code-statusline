@@ -74,12 +74,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RMNCLDYO/create-claude-statusline.git"
+    "url": "git+https://github.com/RMNCLDYO/claude-code-statusline.git"
   },
   "bugs": {
-    "url": "https://github.com/RMNCLDYO/create-claude-statusline/issues"
+    "url": "https://github.com/RMNCLDYO/claude-code-statusline/issues"
   },
-  "homepage": "https://github.com/RMNCLDYO/create-claude-statusline#readme",
+  "homepage": "https://github.com/RMNCLDYO/claude-code-statusline#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
