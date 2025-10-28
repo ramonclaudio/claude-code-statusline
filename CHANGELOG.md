@@ -27,7 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Context window tracking (not supported by Claude Code's stdin data)
 - Inline configuration from `statusline.cjs` (moved to separate config file)
 - All code comments for cleaner codebase
 
