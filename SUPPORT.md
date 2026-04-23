@@ -6,8 +6,8 @@ Thanks for using create-claude-statusline! This document explains how to get hel
 
 ### Community Support
 
-- **GitHub Discussions**: Ask questions and discuss ideas with the community at [GitHub Discussions](https://github.com/RMNCLDYO/create-claude-statusline/discussions)
-- **Issues**: Report bugs or request features through [GitHub Issues](https://github.com/RMNCLDYO/create-claude-statusline/issues)
+- **GitHub Discussions**: Ask questions and discuss ideas with the community at [GitHub Discussions](https://github.com/ramonclaudio/create-claude-statusline/discussions)
+- **Issues**: Report bugs or request features through [GitHub Issues](https://github.com/ramonclaudio/create-claude-statusline/issues)
 
 ### Documentation
 
@@ -45,7 +45,7 @@ Before creating an issue, please:
 
 ## Commercial Support
 
-For priority support, custom implementations, or consulting services, contact <hi@rmncldyo.com>.
+For priority support, custom implementations, or consulting services, contact <hello@ramonclaudio.com>.
 
 ## Contributing
 

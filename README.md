@@ -121,4 +121,4 @@ Then remove the `"statusLine"` section from `.claude/settings.local.json`.
 
 ## License
 
-MIT © [RMNCLDYO](https://github.com/RMNCLDYO)
+MIT © [Ramon Claudio](https://github.com/Ramon Claudio)

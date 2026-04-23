@@ -141,7 +141,7 @@ jobs:
           chmod +x sbom-tool-linux-x64
           
           # Generate Microsoft SBOM
-          ./sbom-tool-linux-x64 generate -b . -bc . -pn create-claude-statusline -pv $VERSION -ps RMNCLDYO -nsb https://github.com/RMNCLDYO/create-claude-statusline
+          ./sbom-tool-linux-x64 generate -b . -bc . -pn create-claude-statusline -pv $VERSION -ps Ramon Claudio -nsb https://github.com/ramonclaudio/create-claude-statusline
           mv _manifest/spdx_2.2/manifest.spdx.json "create-claude-statusline-$VERSION.ms-spdx.json"
           
           # Cleanup
@@ -177,7 +177,7 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@rmncldyo'
+          scope: '@ramonclaudio'
           
       - name: Publish to GitHub Packages
         continue-on-error: true
@@ -203,7 +203,7 @@ jobs:
             
             **Install from GitHub Packages:**
             ```bash
-            npm install -g @rmncldyo/create-claude-statusline@${{ github.ref_name }} --registry=https://npm.pkg.github.com
+            npm install -g @ramonclaudio/create-claude-statusline@${{ github.ref_name }} --registry=https://npm.pkg.github.com
             ```
             
             ## 🔐 Security & Verification
@@ -245,7 +245,7 @@ jobs:
             
             ---
             
-            **Full Changelog**: [CHANGELOG.md](https://github.com/RMNCLDYO/create-claude-statusline/blob/main/CHANGELOG.md)
+            **Full Changelog**: [CHANGELOG.md](https://github.com/ramonclaudio/create-claude-statusline/blob/main/CHANGELOG.md)
           files: |
             create-claude-statusline-*.tgz
             create-claude-statusline-*.tgz.minisig
